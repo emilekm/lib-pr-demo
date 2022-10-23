@@ -1,11 +1,11 @@
 use crate::fields::{Timestamp, ZeroEndedString};
+use crate::types::MessageType;
 use bincode::Decode;
 
-#[derive(Decode)]
-struct MessageLength(u16);
-
-#[derive(Decode)]
-struct MessageType(u8);
+pub struct Header {
+    pub length: u16,
+    pub typ: MessageType,
+}
 
 #[derive(Decode)]
 struct Map {
