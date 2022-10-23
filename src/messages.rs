@@ -2,6 +2,12 @@ use crate::fields::{Timestamp, ZeroEndedString};
 use bincode::Decode;
 
 #[derive(Decode)]
+struct MessageLength(u16);
+
+#[derive(Decode)]
+struct MessageType(u8);
+
+#[derive(Decode)]
 struct Map {
     name: ZeroEndedString,
     gamemode: ZeroEndedString,
