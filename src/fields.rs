@@ -4,6 +4,7 @@ use bincode::impl_borrow_decode;
 use chrono::{DateTime, NaiveDateTime, Utc};
 use std::marker::PhantomData;
 
+#[derive(Debug)]
 pub struct ZeroEndedString(pub String);
 
 impl Decode for ZeroEndedString {
@@ -25,6 +26,7 @@ impl Decode for ZeroEndedString {
 
 impl_borrow_decode!(ZeroEndedString);
 
+#[derive(Debug)]
 pub struct Timestamp<T>(pub DateTime<Utc>, PhantomData<T>);
 
 impl Decode for Timestamp<u32> {
