@@ -3,6 +3,7 @@ use crate::types::MessageType;
 use bincode::de::Decoder;
 use bincode::error::DecodeError;
 use bincode::{impl_borrow_decode, Decode};
+use derive::DecodeWithFlags;
 
 #[derive(Debug)]
 pub struct Header {
@@ -19,6 +20,7 @@ impl Decode for Header {
             10 => MessageType::PlayerUpdate,
             11 => MessageType::PlayerAdd,
             12 => MessageType::PlayerRemove,
+            20 => MessageType::VehicleUpdate,
             _ => MessageType::Invalid,
         };
         Ok(Self {
@@ -127,4 +129,17 @@ pub struct PlayerUpdate {
     kit_name: ZeroEndedString,
 }
 
-// TODO: add decode method for PlayerUpdate
+#[derive(Debug, DecodeWithFlags)]
+pub struct VehicleUpdate {
+    #[flags_field]
+    flags: u8,
+    id: i16,
+    #[flag = 1]
+    team: Option<i8>,
+    #[flag = 2]
+    position: Option<Position>,
+    #[flag = 4]
+    rotation: Option<i16>,
+    #[flag = 8]
+    health: Option<i8>,
+}
