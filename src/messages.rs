@@ -16,9 +16,12 @@ impl Decode for Header {
         let _typ = u8::decode(decoder)?;
         let typ = match _typ {
             0 => MessageType::ServerDetails,
+            10 => MessageType::PlayerUpdate,
+            11 => MessageType::PlayerAdd,
+            12 => MessageType::PlayerRemove,
             _ => MessageType::Invalid,
         };
-        Ok(Header {
+        Ok(Self {
             typ,
             length: length - 1,
         })
@@ -28,7 +31,7 @@ impl Decode for Header {
 impl_borrow_decode!(Header);
 
 #[derive(Decode, Debug)]
-struct Map {
+pub struct Map {
     name: ZeroEndedString,
     gamemode: ZeroEndedString,
     layer: u8,
@@ -50,3 +53,73 @@ pub struct ServerDetails {
     tickets1: u16,
     tickets2: u16,
 }
+
+#[derive(Decode, Debug)]
+pub struct PlayerAdd {
+    id: u8,
+    ign: ZeroEndedString,
+    hash: ZeroEndedString,
+    ip: ZeroEndedString,
+}
+
+#[derive(Decode, Debug)]
+pub struct PlayerRemove {
+    id: u8,
+}
+
+#[derive(Debug)]
+pub struct PlayerVehicle {
+    id: i16,
+    seat_name: Option<ZeroEndedString>,
+    seat_number: Option<i8>,
+}
+
+impl Decode for PlayerVehicle {
+    fn decode<D: Decoder>(decoder: &mut D) -> Result<Self, DecodeError> {
+        let id = i16::decode(decoder)?;
+
+        let mut seat_name: Option<ZeroEndedString> = None;
+        let mut seat_number: Option<i8> = None;
+        if id >= 0 {
+            seat_name = Some(ZeroEndedString::decode(decoder)?);
+            seat_number = Some(i8::decode(decoder)?);
+        }
+
+        Ok(Self {
+            id,
+            seat_name,
+            seat_number,
+        })
+    }
+}
+
+impl_borrow_decode!(PlayerVehicle);
+
+#[derive(Decode, Debug)]
+pub struct Position {
+    x: i16,
+    y: i16,
+    z: i16,
+}
+
+#[derive(Debug)]
+pub struct PlayerUpdate {
+    flags: u16,
+    id: u8,
+    team: i8,
+    squad: u8,
+    vehicle: PlayerVehicle,
+    health: i8,
+    score: i16,
+    teamwork_score: i16,
+    kills: i16,
+    deaths: i16,
+    ping: i16,
+    is_alive: bool,
+    is_joining: bool,
+    position: Position,
+    rotation: i16,
+    kit_name: ZeroEndedString,
+}
+
+// TODO: add decode method for PlayerUpdate
