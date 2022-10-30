@@ -78,17 +78,22 @@ impl Decode for PlayerVehicle {
     fn decode<D: Decoder>(decoder: &mut D) -> Result<Self, DecodeError> {
         let id = i16::decode(decoder)?;
 
-        let mut seat_name: Option<ZeroEndedString> = None;
-        let mut seat_number: Option<i8> = None;
-        if id >= 0 {
-            seat_name = Some(ZeroEndedString::decode(decoder)?);
-            seat_number = Some(i8::decode(decoder)?);
-        }
-
         Ok(Self {
             id,
-            seat_name,
-            seat_number,
+            seat_name: {
+                if id >= 0 {
+                    Some(ZeroEndedString::decode(decoder)?)
+                } else {
+                    None
+                }
+            },
+            seat_number: {
+                if id >= 0 {
+                    Some(i8::decode(decoder)?)
+                } else {
+                    None
+                }
+            },
         })
     }
 }
