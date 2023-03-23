@@ -36,23 +36,23 @@ pub struct Position {
 
 #[derive(Debug, Decode)]
 pub struct CacheAdd {
-    cache_id: u8,
-    cache_pos: Position,
+    id: u8,
+    position: Position,
 }
 
 #[derive(Debug, Decode)]
 pub struct CacheRemove {
-    cache_id: u8,
+    id: u8,
 }
 
 #[derive(Debug, Decode)]
 pub struct CacheReveal {
-    cache_id: u8,
+    id: u8,
 }
 
 #[derive(Debug, Decode)]
 pub struct IntelChange {
-    new_intel_count: i8,
+    intel_count: i8,
 }
 
 #[derive(Debug, Decode)]
