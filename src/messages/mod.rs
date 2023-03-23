@@ -2,9 +2,6 @@ use bincode::de::Decoder;
 use bincode::error::DecodeError;
 use bincode::{impl_borrow_decode, Decode};
 
-pub mod headers;
-pub use headers::*;
-
 pub mod map;
 pub use map::*;
 
