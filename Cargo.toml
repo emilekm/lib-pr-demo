@@ -9,3 +9,4 @@ edition = "2021"
 bincode = { version = "2.0.0-rc.2", features = ["derive", "std"] }
 chrono = "0.4.22"
 compress = "0.2.1"
+derive = { version = "0.1.0", path = "derive" }
