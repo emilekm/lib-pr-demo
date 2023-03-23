@@ -112,3 +112,25 @@ pub struct KitAllocated {
     player_id: u8,
     kit_name: ZeroEndedString,
 }
+
+#[derive(Debug, Decode)]
+pub struct ProjAdd {
+    id: u16,
+    player_id: u8,
+    typ: u8,
+    template_name: ZeroEndedString,
+    rotation: i16,
+    position: Position,
+}
+
+#[derive(Debug, Decode)]
+pub struct ProjUpdate {
+    id: u16,
+    rotation: i16,
+    position: Position,
+}
+
+#[derive(Debug, Decode)]
+pub struct ProjRemove {
+    id: u16,
+}
