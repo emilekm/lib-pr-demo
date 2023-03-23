@@ -86,3 +86,29 @@ pub struct PlayerUpdate {
     #[flag = 32768]
     kit_name: Option<ZeroEndedString>,
 }
+
+#[derive(Debug, Decode)]
+pub struct Kill {
+    attacker_id: u8,
+    victim_id: u8,
+    weapon: ZeroEndedString,
+}
+
+#[derive(Debug, Decode)]
+pub struct Chat {
+    channel: u8,
+    player_id: u8,
+    message: ZeroEndedString,
+}
+
+#[derive(Debug, Decode)]
+pub struct Revive {
+    medic_id: u8,
+    revived_id: u8,
+}
+
+#[derive(Debug, Decode)]
+pub struct KitAllocated {
+    player_id: u8,
+    kit_name: ZeroEndedString,
+}

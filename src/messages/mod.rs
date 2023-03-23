@@ -3,22 +3,19 @@ use bincode::error::DecodeError;
 use bincode::{impl_borrow_decode, Decode};
 
 pub mod headers;
-pub use headers::{Map, ServerDetails};
+pub use headers::*;
+
+pub mod map;
+pub use map::*;
 
 pub mod players;
-pub use players::{PlayerAdd, PlayerRemove, PlayerUpdate};
+pub use players::*;
+
+pub mod teams;
+pub use teams::*;
 
 pub mod vehicles;
-pub use vehicles::{VehicleAdd, VehicleUpdate};
-
-// pub struct Message<T: Decode> {
-//     header: Header,
-//     pos: u64,
-// }
-
-// impl Message {
-//     pub fn read()
-// }
+pub use vehicles::*;
 
 #[derive(Debug)]
 pub struct Header {
@@ -36,10 +33,3 @@ impl Decode for Header {
 }
 
 impl_borrow_decode!(Header);
-
-#[derive(Decode, Debug)]
-pub struct Position {
-    x: i16,
-    y: i16,
-    z: i16,
-}

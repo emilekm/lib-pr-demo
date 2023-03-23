@@ -26,3 +26,10 @@ pub struct VehicleAdd {
     name: ZeroEndedString,
     max_health: u16,
 }
+
+#[derive(Debug, Decode)]
+pub struct VehicleDestroyed {
+    id: i16,
+    is_killer_known: bool,
+    killer_id: u8,
+}
