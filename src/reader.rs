@@ -19,7 +19,6 @@ pub struct DemoReader {
         config::NoLimit,
     >,
     cursor: Cursor<Vec<u8>>,
-    last_length: u16,
 }
 
 impl DemoReader {
@@ -35,24 +34,20 @@ impl DemoReader {
         Self {
             cursor: Cursor::new(decompressed),
             config,
-            last_length: 0,
         }
     }
 
-    pub fn skip_message(&mut self) -> u64 {
-        self.cursor
-            .seek(SeekFrom::Current(self.last_length as i64))
-            .unwrap()
+    pub fn skip_message(&mut self, size: u16) -> u64 {
+        self.cursor.seek(SeekFrom::Current(size as i64)).unwrap()
     }
 
     pub fn has_message(&mut self) -> bool {
         self.cursor.get_ref().len() as u64 - self.cursor.position() >= 3
     }
 
-    pub fn read_message(&mut self) -> Result<Messages, DecodeError> {
+    pub fn read_message(mut self) -> Result<Messages, DecodeError> {
         let config = self.config;
         let header: messages::Header = bincode::decode_from_reader(&mut self, config)?;
-        self.last_length = header.length;
         match header.typ {
             types::SERVER_DETAILS => Ok(Messages::ServerDetails(bincode::decode_from_reader(
                 &mut self, config,
