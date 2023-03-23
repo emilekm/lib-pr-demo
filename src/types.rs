@@ -1,47 +1,53 @@
 use crate::messages;
 
-pub const SERVER_DETAILS: u8 = 0;
-pub const DOD_LIST: u8 = 1;
+pub const SERVER_DETAILS: u8 = 0x00;
+pub const DOD_LIST: u8 = 0x01;
 
-pub const PLAYER_UPDATE: u8 = 16;
-pub const PLAYER_ADD: u8 = 17;
-pub const PLAYER_REMOVE: u8 = 18;
+pub const PLAYER_UPDATE: u8 = 0x10;
+pub const PLAYER_ADD: u8 = 0x11;
+pub const PLAYER_REMOVE: u8 = 0x12;
 
-pub const VEHICLE_UPDATE: u8 = 32;
-pub const VEHICLE_ADD: u8 = 33;
-pub const VEHICLE_DESTROYED: u8 = 34;
+pub const VEHICLE_UPDATE: u8 = 0x20;
+pub const VEHICLE_ADD: u8 = 0x21;
+pub const VEHICLE_DESTROYED: u8 = 0x22;
 
-pub const FOB_ADD: u8 = 48;
-pub const FOB_REMOVE: u8 = 49;
+pub const FOB_ADD: u8 = 0x30;
+pub const FOB_REMOVE: u8 = 0x31;
 
-pub const FLAG_UPDATE: u8 = 64;
-pub const FLAG_LIST: u8 = 65;
+pub const FLAG_UPDATE: u8 = 0x40;
+pub const FLAG_LIST: u8 = 0x41;
 
-pub const KILL: u8 = 80;
-pub const CHAT: u8 = 81;
+pub const KILL: u8 = 0x50;
+pub const CHAT: u8 = 0x51;
 
-pub const TICKETS_TEAM1: u8 = 82;
-pub const TICKETS_TEAM2: u8 = 83;
+pub const TICKETS_TEAM1: u8 = 0x52;
+pub const TICKETS_TEAM2: u8 = 0x53;
 
-pub const RALLY_ADD: u8 = 96;
-pub const RALLY_REMOVE: u8 = 97;
+pub const RALLY_ADD: u8 = 0x60;
+pub const RALLY_REMOVE: u8 = 0x61;
 
-pub const CACHE_ADD: u8 = 112;
-pub const CACHE_REMOVE: u8 = 113;
-pub const CACHE_REVEAL: u8 = 114;
-pub const INTEL_CHANGE: u8 = 115;
+pub const CACHE_ADD: u8 = 0x70;
+pub const CACHE_REMOVE: u8 = 0x71;
+pub const CACHE_REVEAL: u8 = 0x72;
+pub const INTEL_CHANGE: u8 = 0x73;
 
-pub const PROJ_UPDATE: u8 = 144;
-pub const PROJ_ADD: u8 = 145;
-pub const PROJ_REMOVE: u8 = 146;
+pub const MARKER_ADD: u8 = 0x80;
+pub const MARKER_REMOVE: u8 = 0x81;
 
-pub const REVIVE: u8 = 160;
-pub const KITALLOCATED: u8 = 161;
-pub const SQUADNAME: u8 = 162;
-pub const SLORDERS: u8 = 163;
+pub const PROJ_UPDATE: u8 = 0x90;
+pub const PROJ_ADD: u8 = 0x91;
+pub const PROJ_REMOVE: u8 = 0x92;
 
-pub const ROUNDEND: u8 = 240;
-pub const TICKS: u8 = 241;
+pub const REVIVE: u8 = 0xA0;
+pub const KITALLOCATED: u8 = 0xA1;
+pub const SQUADNAME: u8 = 0xA2;
+pub const SLORDERS: u8 = 0xA3;
+
+pub const ROUNDEND: u8 = 0xF0;
+pub const TICKS: u8 = 0xF1;
+
+pub const PRIVATEMESSAGE: u8 = 0xFD;
+pub const ERRORMESSAGE: u8 = 0xFE;
 
 #[derive(Debug)]
 pub enum Messages {
