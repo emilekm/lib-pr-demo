@@ -11,13 +11,23 @@ use crate::{
     types::{self, Messages},
 };
 
+// At least a length (u16) and type (u8) are required for a valid message to be read
+const MIN_MESSAGE_LEN: u64 = 3;
+
+type DemoConfig = config::Configuration<
+    config::LittleEndian,
+    config::Fixint,
+    config::SkipFixedArrayLength,
+    config::NoLimit,
+>;
+
+const CONFIG: DemoConfig = bincode::config::standard()
+    .with_little_endian()
+    .with_fixed_int_encoding()
+    .skip_fixed_array_length();
+
 pub struct DemoReader {
-    config: config::Configuration<
-        config::LittleEndian,
-        config::Fixint,
-        config::SkipFixedArrayLength,
-        config::NoLimit,
-    >,
+    config: DemoConfig,
     cursor: Cursor<Vec<u8>>,
 }
 
@@ -26,14 +36,9 @@ impl DemoReader {
         let mut decompressed = Vec::new();
         _ = zlib::Decoder::new(file).read_to_end(&mut decompressed);
 
-        let config = bincode::config::standard()
-            .with_little_endian()
-            .with_fixed_int_encoding()
-            .skip_fixed_array_length();
-
         Self {
             cursor: Cursor::new(decompressed),
-            config,
+            config: CONFIG,
         }
     }
 
@@ -42,7 +47,7 @@ impl DemoReader {
     }
 
     pub fn has_message(&mut self) -> bool {
-        self.cursor.get_ref().len() as u64 - self.cursor.position() >= 3
+        self.cursor.get_ref().len() as u64 - self.cursor.position() >= MIN_MESSAGE_LEN
     }
 
     pub fn read_message(mut self) -> Result<Messages, DecodeError> {
