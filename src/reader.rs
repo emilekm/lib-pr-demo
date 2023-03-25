@@ -7,7 +7,7 @@ use bincode::{config, de::read::Reader, error::DecodeError};
 use compress::zlib;
 
 use crate::{
-    messages,
+    messages::{self, LengthSize, MessageType},
     types::{self, Messages},
 };
 
@@ -29,20 +29,22 @@ const CONFIG: DemoConfig = bincode::config::standard()
 pub struct DemoReader {
     config: DemoConfig,
     cursor: Cursor<Vec<u8>>,
+    read: Vec<MessageType>,
 }
 
 impl DemoReader {
-    pub fn new(file: File) -> Self {
+    pub fn new(file: File, read: Vec<MessageType>) -> Self {
         let mut decompressed = Vec::new();
         _ = zlib::Decoder::new(file).read_to_end(&mut decompressed);
 
         Self {
             cursor: Cursor::new(decompressed),
             config: CONFIG,
+            read,
         }
     }
 
-    pub fn skip_message(&mut self, size: u16) -> u64 {
+    pub fn skip_message(&mut self, size: LengthSize) -> u64 {
         self.cursor.seek(SeekFrom::Current(size as i64)).unwrap()
     }
 
@@ -53,23 +55,30 @@ impl DemoReader {
     pub fn read_message(mut self) -> Result<Messages, DecodeError> {
         let config = self.config;
         let header: messages::Header = bincode::decode_from_reader(&mut self, config)?;
-        match header.typ {
-            types::SERVER_DETAILS => Ok(Messages::ServerDetails(bincode::decode_from_reader(
-                &mut self, config,
-            )?)),
-            types::PLAYER_UPDATE => Ok(Messages::PlayerUpdate(bincode::decode_from_reader(
-                &mut self, config,
-            )?)),
-            types::PLAYER_ADD => Ok(Messages::PlayerAdd(bincode::decode_from_reader(
-                &mut self, config,
-            )?)),
-            types::PLAYER_REMOVE => Ok(Messages::PlayerRemove(bincode::decode_from_reader(
-                &mut self, config,
-            )?)),
-            types::VEHICLE_UPDATE => Ok(Messages::VehicleUpdate(bincode::decode_from_reader(
-                &mut self, config,
-            )?)),
-            _ => Ok(Messages::Invalid(header)),
+
+        // Skip message if it is not in self.read
+        if !self.read.contains(&header.typ) {
+            self.skip_message(header.length);
+            self.read_message()
+        } else {
+            match header.typ {
+                MessageType::ServerDetails => Ok(Messages::ServerDetails(
+                    bincode::decode_from_reader(&mut self, config)?,
+                )),
+                MessageType::PlayerUpdate => Ok(Messages::PlayerUpdate(
+                    bincode::decode_from_reader(&mut self, config)?,
+                )),
+                MessageType::PlayerAdd => Ok(Messages::PlayerAdd(bincode::decode_from_reader(
+                    &mut self, config,
+                )?)),
+                MessageType::PlayerRemove => Ok(Messages::PlayerRemove(
+                    bincode::decode_from_reader(&mut self, config)?,
+                )),
+                MessageType::VehicleUpdate => Ok(Messages::VehicleUpdate(
+                    bincode::decode_from_reader(&mut self, config)?,
+                )),
+                _ => Ok(Messages::Invalid(header)),
+            }
         }
     }
 }
