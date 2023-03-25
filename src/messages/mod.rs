@@ -23,7 +23,7 @@ pub struct Header {
 impl Decode for Header {
     fn decode<D: Decoder>(decoder: &mut D) -> Result<Self, DecodeError> {
         Ok(Self {
-            length: u16::decode(decoder)? - 1,
+            length: u16::decode(decoder)? - 1, // substract the type size decoded bellow
             typ: u8::decode(decoder)?,
         })
     }
