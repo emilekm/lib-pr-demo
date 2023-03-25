@@ -20,7 +20,8 @@ pub enum Messages {
     RallyAdd(messages::RallyAdd),
     RallyRemove(messages::RallyRemove),
 
-    Tickets(messages::Tickets),
+    TicketsTeam1(messages::Tickets),
+    TicketsTeam2(messages::Tickets),
 
     SquadName(messages::SquadName),
     SLOrder(messages::SLOrder),

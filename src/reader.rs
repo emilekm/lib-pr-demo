@@ -8,7 +8,7 @@ use compress::zlib;
 
 use crate::{
     messages::{self, LengthSize, MessageType},
-    types::{self, Messages},
+    types::Messages,
 };
 
 // At least a length (u16) and type (u8) are required for a valid message to be read
