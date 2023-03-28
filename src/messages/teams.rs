@@ -1,4 +1,5 @@
 use bincode::Decode;
+use derive::DecodeMultiple;
 
 use crate::fields::ZeroEndedString;
 
@@ -11,9 +12,19 @@ pub struct FobAdd {
     position: Position,
 }
 
+#[derive(Debug, DecodeMultiple)]
+pub struct FobsAdd {
+    fobs: Vec<FobAdd>,
+}
+
 #[derive(Debug, Decode)]
 pub struct FobRemove {
     id: i32,
+}
+
+#[derive(Debug, DecodeMultiple)]
+pub struct FobsRemove {
+    fobs: Vec<FobRemove>,
 }
 
 #[derive(Debug, Decode)]
@@ -43,4 +54,9 @@ pub struct SLOrder {
     team_squad: u8,
     order_type: u8,
     position: Position,
+}
+
+#[derive(Debug, DecodeMultiple)]
+pub struct SLOrders {
+    orders: Vec<SLOrder>,
 }

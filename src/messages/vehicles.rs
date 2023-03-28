@@ -1,5 +1,5 @@
 use bincode::{de::Decoder, error::DecodeError, Decode};
-use derive::DecodeWithFlags;
+use derive::{DecodeMultiple, DecodeWithFlags};
 
 use crate::fields::ZeroEndedString;
 
@@ -20,11 +20,21 @@ pub struct VehicleUpdate {
     health: Option<i8>,
 }
 
+#[derive(Debug, DecodeMultiple)]
+pub struct VehiclesUpdate {
+    vehicles: Vec<VehicleUpdate>,
+}
+
 #[derive(Debug, Decode)]
 pub struct VehicleAdd {
     id: i16,
     name: ZeroEndedString,
     max_health: u16,
+}
+
+#[derive(Debug, DecodeMultiple)]
+pub struct VehiclesAdd {
+    vehicles: Vec<VehicleAdd>,
 }
 
 #[derive(Debug, Decode)]

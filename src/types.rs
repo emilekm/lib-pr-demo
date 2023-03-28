@@ -6,16 +6,16 @@ pub enum Messages {
 
     ServerDetails(messages::ServerDetails),
 
-    PlayerUpdate(messages::PlayerUpdate),
+    PlayerUpdate(messages::PlayersUpdate),
     PlayerAdd(messages::PlayersAdd),
     PlayerRemove(messages::PlayerRemove),
 
-    VehicleUpdate(messages::VehicleUpdate),
-    VehicleAdd(messages::VehicleAdd),
+    VehicleUpdate(messages::VehiclesUpdate),
+    VehicleAdd(messages::VehiclesAdd),
     VehicleDestroyed(messages::VehicleDestroyed),
 
-    FobAdd(messages::FobAdd),
-    FobRemove(messages::FobRemove),
+    FobAdd(messages::FobsAdd),
+    FobRemove(messages::FobsRemove),
 
     RallyAdd(messages::RallyAdd),
     RallyRemove(messages::RallyRemove),
@@ -24,7 +24,7 @@ pub enum Messages {
     TicketsTeam2(messages::Tickets),
 
     SquadName(messages::SquadName),
-    SLOrder(messages::SLOrder),
+    SLOrder(messages::SLOrders),
 
     Kill(messages::Kill),
     Chat(messages::Chat),
@@ -36,11 +36,11 @@ pub enum Messages {
     ProjUpdate(messages::ProjUpdate),
     ProjRemove(messages::ProjRemove),
 
-    CacheAdd(messages::CacheAdd),
+    CacheAdd(messages::CachesAdd),
     CacheRemove(messages::CacheRemove),
-    CacheReveal(messages::CacheReveal),
+    CacheReveal(messages::CachesReveal),
     IntelChange(messages::IntelChange),
 
-    DoDList(messages::DoDList),
+    DoDList(messages::DoDLists),
     Flags(messages::Flags),
 }

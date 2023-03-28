@@ -1,4 +1,5 @@
 use bincode::Decode;
+use derive::DecodeMultiple;
 
 use crate::fields::{Timestamp, ZeroEndedString};
 
@@ -40,6 +41,11 @@ pub struct CacheAdd {
     position: Position,
 }
 
+#[derive(Debug, DecodeMultiple)]
+pub struct CachesAdd {
+    caches: Vec<CacheAdd>,
+}
+
 #[derive(Debug, Decode)]
 pub struct CacheRemove {
     id: u8,
@@ -48,6 +54,11 @@ pub struct CacheRemove {
 #[derive(Debug, Decode)]
 pub struct CacheReveal {
     id: u8,
+}
+
+#[derive(Debug, DecodeMultiple)]
+pub struct CachesReveal {
+    caches: Vec<CacheReveal>,
 }
 
 #[derive(Debug, Decode)]
@@ -64,10 +75,20 @@ pub struct DoDList {
     points_array: Vec<(f32, f32)>,
 }
 
+#[derive(Debug, DecodeMultiple)]
+pub struct DoDLists {
+    dods: Vec<DoDList>,
+}
+
 #[derive(Debug, Decode)]
-pub struct Flags {
+pub struct Flag {
     cp_id: i16,
     owning_team: u8,
     position: Position,
     radius: u16,
+}
+
+#[derive(Debug, DecodeMultiple)]
+pub struct Flags {
+    flags: Vec<Flag>,
 }

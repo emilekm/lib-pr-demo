@@ -14,7 +14,7 @@ pub fn derive_decode_with_flags(input: TokenStream) -> TokenStream {
 
 mod multiple;
 
-#[proc_macro_derive(DecodeMultiple, attributes(many))]
+#[proc_macro_derive(DecodeMultiple)]
 pub fn derive_decode_multiple(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
     match multiple::impl_my_derive(&input) {
