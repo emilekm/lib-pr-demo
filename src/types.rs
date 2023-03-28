@@ -2,12 +2,12 @@ use crate::messages;
 
 #[derive(Debug)]
 pub enum Messages {
-    Invalid(messages::Header),
+    Skip(messages::Header),
 
     ServerDetails(messages::ServerDetails),
 
     PlayerUpdate(messages::PlayerUpdate),
-    PlayerAdd(messages::PlayerAdd),
+    PlayerAdd(messages::PlayersAdd),
     PlayerRemove(messages::PlayerRemove),
 
     VehicleUpdate(messages::VehicleUpdate),

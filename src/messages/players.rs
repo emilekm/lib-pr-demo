@@ -1,6 +1,6 @@
 use bincode::{de::Decoder, error::DecodeError};
 use bincode::{impl_borrow_decode, Decode};
-use derive::DecodeWithFlags;
+use derive::{DecodeMultiple, DecodeWithFlags};
 
 use crate::fields::ZeroEndedString;
 
@@ -12,6 +12,12 @@ pub struct PlayerAdd {
     ign: ZeroEndedString,
     hash: ZeroEndedString,
     ip: ZeroEndedString,
+}
+
+#[derive(Debug, DecodeMultiple)]
+pub struct PlayersAdd {
+    #[many = "PlayerAdd"]
+    players: Vec<PlayerAdd>,
 }
 
 #[derive(Decode, Debug)]

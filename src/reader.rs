@@ -28,7 +28,7 @@ const CONFIG: DemoConfig = bincode::config::standard()
 
 pub struct DemoReader {
     config: DemoConfig,
-    cursor: Cursor<Vec<u8>>,
+    container: Container<Vec<u8>>,
     read: Vec<MessageType>,
 }
 
@@ -38,52 +38,76 @@ impl DemoReader {
         _ = zlib::Decoder::new(file).read_to_end(&mut decompressed);
 
         Self {
-            cursor: Cursor::new(decompressed),
+            container: Container {
+                cursor: Cursor::new(decompressed),
+            },
             config: CONFIG,
             read,
         }
     }
 
     pub fn skip_message(&mut self, size: LengthSize) -> u64 {
-        self.cursor.seek(SeekFrom::Current(size as i64)).unwrap()
+        self.container
+            .cursor
+            .seek(SeekFrom::Current(size as i64))
+            .unwrap()
     }
 
     pub fn has_message(&mut self) -> bool {
-        self.cursor.get_ref().len() as u64 - self.cursor.position() >= MIN_MESSAGE_LEN
+        self.container.cursor.get_ref().len() as u64 - self.container.cursor.position()
+            >= MIN_MESSAGE_LEN
     }
 
-    pub fn read_message(mut self) -> Result<Messages, DecodeError> {
+    pub fn read_message(&mut self) -> Result<Messages, DecodeError> {
         let config = self.config;
-        let header: messages::Header = bincode::decode_from_reader(&mut self, config)?;
+        let header: messages::Header = bincode::decode_from_reader(&mut self.container, config)?;
 
         // Skip message if it is not in self.read
-        if !self.read.contains(&header.typ) {
-            self.skip_message(header.length);
-            self.read_message()
-        } else {
+        if self.read.contains(&header.typ) {
+            let mut buf = vec![0u8; header.length as usize];
+            self.container.read(&mut buf).unwrap();
+            let cursor = Cursor::new(buf);
+            let container: &mut Container<Vec<u8>> = &mut Container { cursor };
             match header.typ {
                 MessageType::ServerDetails => Ok(Messages::ServerDetails(
-                    bincode::decode_from_reader(&mut self, config)?,
+                    bincode::decode_from_reader(container, config)?,
                 )),
                 MessageType::PlayerUpdate => Ok(Messages::PlayerUpdate(
-                    bincode::decode_from_reader(&mut self, config)?,
+                    bincode::decode_from_reader(container, config)?,
                 )),
                 MessageType::PlayerAdd => Ok(Messages::PlayerAdd(bincode::decode_from_reader(
-                    &mut self, config,
+                    container, config,
                 )?)),
                 MessageType::PlayerRemove => Ok(Messages::PlayerRemove(
-                    bincode::decode_from_reader(&mut self, config)?,
+                    bincode::decode_from_reader(container, config)?,
                 )),
                 MessageType::VehicleUpdate => Ok(Messages::VehicleUpdate(
-                    bincode::decode_from_reader(&mut self, config)?,
+                    bincode::decode_from_reader(container, config)?,
                 )),
-                _ => Ok(Messages::Invalid(header)),
+                _ => Ok(Messages::Skip(header)),
             }
+        } else {
+            Ok(Messages::Skip(header))
         }
     }
 }
 
-impl Reader for DemoReader {
+struct Container<T> {
+    cursor: Cursor<T>,
+}
+
+impl Reader for Container<Vec<u8>> {
+    fn read(&mut self, bytes: &mut [u8]) -> Result<(), DecodeError> {
+        self.cursor
+            .read_exact(bytes)
+            .map_err(|inner| DecodeError::Io {
+                inner,
+                additional: bytes.len(),
+            })
+    }
+}
+
+impl Reader for Container<&mut [u8]> {
     fn read(&mut self, bytes: &mut [u8]) -> Result<(), DecodeError> {
         self.cursor
             .read_exact(bytes)
