@@ -16,7 +16,6 @@ pub struct PlayerAdd {
 
 #[derive(Debug, DecodeMultiple)]
 pub struct PlayersAdd {
-    #[many = "PlayerAdd"]
     players: Vec<PlayerAdd>,
 }
 
@@ -91,6 +90,11 @@ pub struct PlayerUpdate {
     rotation: Option<i16>,
     #[flag = 32768]
     kit_name: Option<ZeroEndedString>,
+}
+
+#[derive(Debug, DecodeMultiple)]
+pub struct PlayersUpdate {
+    players: Vec<PlayerUpdate>,
 }
 
 #[derive(Debug, Decode)]

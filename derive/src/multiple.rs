@@ -2,10 +2,52 @@ use proc_macro::TokenStream;
 use quote::{quote, ToTokens};
 use syn::{Data, DeriveInput, Error, Fields, Ident, Type, TypePath};
 
+fn extract_type_from_vec(ty: &syn::Type) -> Option<&syn::Type> {
+    use syn::{GenericArgument, Path, PathArguments, PathSegment};
+
+    fn extract_type_path(ty: &syn::Type) -> Option<&Path> {
+        match *ty {
+            syn::Type::Path(ref typepath) if typepath.qself.is_none() => Some(&typepath.path),
+            _ => None,
+        }
+    }
+
+    fn extract_vec_segment(path: &Path) -> Option<&PathSegment> {
+        let idents_of_path = path
+            .segments
+            .iter()
+            .into_iter()
+            .fold(String::new(), |mut acc, v| {
+                acc.push_str(&v.ident.to_string());
+                acc.push('|');
+                acc
+            });
+        vec!["Vec|"]
+            .into_iter()
+            .find(|s| &idents_of_path == *s)
+            .and_then(|_| path.segments.last())
+    }
+
+    extract_type_path(ty)
+        .and_then(|path| extract_vec_segment(path))
+        .and_then(|path_seg| {
+            let type_params = &path_seg.arguments;
+            // It should have only on angle-bracketed param ("<String>"):
+            match *type_params {
+                PathArguments::AngleBracketed(ref params) => params.args.first(),
+                _ => None,
+            }
+        })
+        .and_then(|generic_arg| match *generic_arg {
+            GenericArgument::Type(ref ty) => Some(ty),
+            _ => None,
+        })
+}
+
 struct StructField {
     name: Ident,
     typ: TypePath,
-    underlaying_type: String,
+    basic_type: Type,
 }
 
 pub fn impl_my_derive(input: &DeriveInput) -> Result<TokenStream, Error> {
@@ -24,24 +66,12 @@ pub fn impl_my_derive(input: &DeriveInput) -> Result<TokenStream, Error> {
                         ),
                     };
 
-                    let mut underlaying_type: String = String::new();
-                    for attr in &field.attrs {
-                        let (key, value): (String, String) = match attr.parse_meta().unwrap() {
-                            syn::Meta::NameValue(syn::MetaNameValue {
-                                path,
-                                lit: syn::Lit::Str(s),
-                                ..
-                            }) => (path.segments[0].ident.to_string(), s.value()),
-                            _ => panic!("malformed attribute syntax"),
-                        };
-                        if key == "many" {
-                            underlaying_type = value;
-                        }
-                    }
+                    let basic_type = extract_type_from_vec(&field.ty).unwrap();
+
                     all_fields.push(StructField {
                         name: field_name.clone(),
                         typ: field_type.clone(),
-                        underlaying_type,
+                        basic_type: basic_type.clone(),
                     })
                 }
             }
@@ -56,7 +86,7 @@ pub fn impl_my_derive(input: &DeriveInput) -> Result<TokenStream, Error> {
 
     let field_name = &all_fields[0].name;
     let field_type = &all_fields[0].typ;
-    let basic_type: proc_macro2::TokenStream = all_fields[0].underlaying_type.parse().unwrap();
+    let basic_type = &all_fields[0].basic_type;
 
     let name = &input.ident;
     let out = quote! {
